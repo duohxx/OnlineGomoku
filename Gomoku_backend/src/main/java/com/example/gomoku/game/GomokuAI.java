@@ -3,6 +3,7 @@ package com.example.gomoku.game;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 // 1. traverse all cell that close the existing pieces
 // 2. get each cell's score
@@ -52,11 +53,12 @@ public class GomokuAI {
         this.grid.forEach((C, value) -> {
             int count = -1;  // count the connected cell number
             int x = C.x(), y = C.y();
-            HashSet<GomokuRule.Cell> Result = new HashSet<>();
+            HashSet<GomokuRule.Cell> Result = new HashSet<GomokuRule.Cell>();
             System.out.println("init fourArray: " + this.AliveFourList);
             // step 1: vertical estimate
             for(int i = y; i < y+4 && i <= 15 && getTypeFromGrid(x, i) == piece; i++, count++ ){
                 GomokuRule.Cell cell = new GomokuRule.Cell(x, i);
+                System.out.println("cell: " + cell);
                 Result.add(cell);
             }
             for(int i = y; i > y-4 && i >= 0 && getTypeFromGrid(x, i) == piece; i--, count++ ){
@@ -72,7 +74,7 @@ public class GomokuAI {
             }
             // step 2: horizontal estimate
             count = -1;
-            Result.clear();
+            Result = new HashSet<GomokuRule.Cell>();
             for( int i = x; i < x+4 && i <= 15 && getTypeFromGrid(i, y) == piece; i++, count++ ){
                 GomokuRule.Cell cell = new GomokuRule.Cell(i, y);
                 Result.add(cell);
@@ -89,7 +91,7 @@ public class GomokuAI {
             }
             // step 3:  diagonal estimate
             count = -1;
-            Result.clear();
+            Result = new HashSet<GomokuRule.Cell>();
             for( int i = x, j = y; i < x+4 && i <= 15 && j < y+4 && j <= 15 && getTypeFromGrid(i, j) == piece; i++, j++, count++ ){
                 GomokuRule.Cell cell = new GomokuRule.Cell(i, j);
                 Result.add(cell);
@@ -106,7 +108,7 @@ public class GomokuAI {
             }
             //
             count = -1;
-            Result.clear();
+            Result = new HashSet<GomokuRule.Cell>();
             for( int i = x, j = y; i < x+4 && i <= 15 && j > y-4 && j >= 0 && getTypeFromGrid(i, j) == piece; i++, j--, count++ ) {
                 GomokuRule.Cell cell = new GomokuRule.Cell(i, j);
                 Result.add(cell);

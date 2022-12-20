@@ -1,8 +1,7 @@
 package com.example.gomoku.game;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class GomokuRule {
     private Integer step = 0;   // How many steps
@@ -14,7 +13,7 @@ public class GomokuRule {
 
     }
 
-    public HashSet< HashSet<Cell> > getAliveFour(){
+    public HashSet< HashSet<Cell>> getAliveFour(){
         GomokuAI g = new GomokuAI( this.grid );
         return g.findAliveFour();
     }
@@ -49,7 +48,12 @@ public class GomokuRule {
         if( this.grid.isEmpty() ){
             return "The broad already empty";
         } else {
-            this.grid.remove( this.step );
+            System.out.println(this.grid);
+            Collection<Integer> steps = this.grid.values();   // according shallow clone to remove the cell of this.grid
+            while ( steps.contains( this.step) ){
+                steps.remove(this.step);
+            }
+            System.out.println(this.grid);
             this.step--;
             return "Undo Successfully" ;
         }

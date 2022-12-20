@@ -73,7 +73,7 @@ class Gomoku extends Component {
  
   }
 
-  undoPiece = () => {
+  async undoPiece () {
     // const undoCoordinate = this.state.history.coordinate.slice(-1);
     const history = this.state.history.slice(0, this.state.stepNumber);
     this.setState({
@@ -82,8 +82,12 @@ class Gomoku extends Component {
       xIsNext: !this.state.xIsNext,
       end: false
     });
-    console.log(this)
-    undo()
+    const response = await undo();
+    if ( response.status === 200 ){
+      console.log(response.data)
+    } else {
+      console( response.err )
+    }
   }
 
   async findFour( ) {

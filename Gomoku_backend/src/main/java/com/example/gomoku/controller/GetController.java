@@ -7,6 +7,7 @@ import com.example.gomoku.game.GomokuRule;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.TreeSet;
 
 @Controller
 @CrossOrigin
