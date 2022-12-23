@@ -1,130 +1,204 @@
-// import React, { Component } from 'react';
-// import axios from 'axios'
-// import GobangBoard from '../gobangBoard/GobangBoard';
-// import './index.css';
+import React, { Component } from 'react';
+import GobangBoard from '../gobangBoard/GobangBoard';
+import './index.css';
+import{
+  undo,
+  setCoordinate,
+  getAllSteps,
+  reset,
+  findAliveFour,
+  findBlockedThree
+} from '../api/index'
+class Gomoku extends Component {
 
-// class GoBang extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       history: [{
-//         squares: Array(225).fill(null),
-//         coordinate: [],
-//       }],
-//       stepNumber: 0,
-//       xIsNext: true,
-//       lines: [], // 存储棋子的索引的数组
-//     };
-//   }
-//   /**
-//    * @function 方格对应的点击事件
-//    * @description  游戏未结束，存档;游戏决出胜利者，三连高亮显示；游戏结束，弹出提示；
-//    * @param {number} i 对应方格在数组中的索引index
-//    * 
-//    * */
+    state = {
+      history: [{
+        squares: Array(225).fill(null),
+        color: Array(225).fill('green'),
+        coordinate: [],
+      }],
+      stepNumber: 0,
+      xIsNext: true,
+      end: false
+    };
+  /**
+   * @function Click the broad
+   * @description  
+   * @param {number} i is the step index
+   * 
+   * */
 
-//   handleClick(i) {
-//     const history = this.state.history.slice(0, this.state.stepNumber + 1);
-//     const current = history[this.state.stepNumber];
+  async handleClick(i) {
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
+    const current = history[this.state.stepNumber];
 
-//     const squares = current.squares.slice();
-//     // 如果游戏结束或者该位置上已经有棋子跳出函数
-//     if (squares[i]) {
-//       return;
-//     }
-//     squares[i] = this.state.xIsNext ? 'X' : 'O'; // 在数组对应位置填充棋子
-//     // const coordinateArray = this.produceCoordinate();
-//     // let coordinate = `(${coordinateArray[i].x},${coordinateArray[i].y})`;
+    const squares = current.squares.slice();
+    const color = Array(225).fill('green');
+    let end = false
+    // if the cell are already full
+    if (squares[i] || this.state.end) {
+      return;
+    }
 
-//     this.setState({
-//       history: history.concat([{
-//         squares: squares,
-//         // coordinate: coordinate
-//         coordinate: i
-//       }]),
-//       stepNumber: history.length,
-//       xIsNext: !this.state.xIsNext,
-//     });
-//     // onst {history} = this.state
-//     console.log(this)
-//     this.submit(i)
-//   }
+    const steps = await setCoordinate(i)
+    if( steps.status === 200 ){
+      if(steps.data){
+          console.log(steps)
+          end = true
+          steps.data.forEach(element => {
+            color[element.x - 1 + 15 * (element.y - 1)] = "red"
+          });
+      }
+    } else {
+      console.log(steps.err)
+    }
 
-//   undo = () => {
-//     // const undoCoordinate = this.state.history.coordinate.slice(-1);
-//     const history = this.state.history.slice(0, this.state.stepNumber);
-//     this.setState({
-//       history: history,
-//       stepNumber: history.length-1,
-//       xIsNext: !this.state.xIsNext,
-//     });
-//     console.log(this)
-//     axios.get('http://localhost:8080/gomoku/undo')
-//     .then((response) => {
-// 		  if (response.status === 200) {
-//       console.log(response.data)
-// 		}
-// 	})
-//     .catch(err => console.log(err))
-//   }
+    // const promise = setCoordinate(i)
+    // promise.then((response) => {
+    //   console.log(response)
+    // })
+    // .catch(err => console.log(err))
 
-//   submit = (id) => {
-//     axios.get('http://localhost:8080/gomoku/set/'+id)
-//     .then((response) => {
-// 		  if (response.status === 200) {
-//       console.log(response.data)
-// 		}
-// 	})
-//     .catch(err => console.log(err))
-// }
+    squares[i] = this.state.xIsNext ? 'X' : 'O'; // fill the broad
+    this.setState({
+      history: history.concat([{
+        squares: squares,
+        coordinate: i,
+        color: color,
+      }]),
+      stepNumber: history.length,
+      xIsNext: !this.state.xIsNext,
+      end: end
+    });
+    // console.log(this)
+ 
+  }
 
+  async undoPiece () {
+    // const undoCoordinate = this.state.history.coordinate.slice(-1);
+    const history = this.state.history.slice(0, this.state.stepNumber);
+    this.setState({
+      history: history,
+      stepNumber: history.length-1,
+      xIsNext: !this.state.xIsNext,
+      end: false
+    });
+    const response = await undo();
+    if ( response.status === 200 ){
+      console.log(response.data)
+    } else {
+      console( response.err )
+    }
+  }
 
+  async findFour( ) {
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
+    const current = history[this.state.stepNumber];
 
-//   render() {
-//     let { lines } = this.state;
-//     const { history, stepNumber } = this.state;
-//     const current = history[stepNumber];
+    const color = Array(225).fill('green');
+    const response = await findAliveFour();
+    if( response.status === 200 ){
+      console.log("the findfour is: " + response.data.x)
+      response.data.forEach(line => {
+        line.forEach(cell =>{
+          color[cell.x - 1 + 15 * (cell.y - 1)] = "yellow"
+        })
+      });
+    } else {
+      console.log(response.err)
+    }
+    this.setState({
+      history: history.concat([{
+        squares: current.squares,
+        coordinate: current.coordinate,
+        color: color,
+      }]),
+      stepNumber: history.length,
+      xIsNext: this.state.xIsNext,
+      end: this.state.end
+    });
+    
+  }
 
-//     return (
-//       <div className="game">
-//         <div className="game-board">
-//           <GobangBoard
-//             squares={current.squares}
-//             onClick={(i) => this.handleClick(i)}
-//             lines={lines}
-//           />
-//         </div>
-//         <div>
-//           <button onClick={() => this.undo()}>Undo</button>
-//         </div>
-//       </div>
-//     );
-//   }
-// }
+  async findBlockedThree( ) {
+    const history = this.state.history.slice(0, this.state.stepNumber + 1);
+    const current = history[this.state.stepNumber];
 
-// export default GoBang;
+    const color = Array(225).fill('green');
+    const response = await findBlockedThree();
+    if( response.status === 200 ){
+      console.log("the findBlockedThree is: " + response.data.x)
+      response.data.forEach(line => {
+        line.forEach(cell =>{
+          color[cell.x - 1 + 15 * (cell.y - 1)] = "yellow"
+        })
+      });
+    } else {
+      console.log(response.err)
+    }
+    this.setState({
+      history: history.concat([{
+        squares: current.squares,
+        coordinate: current.coordinate,
+        color: color,
+      }]),
+      stepNumber: history.length,
+      xIsNext: this.state.xIsNext,
+      end: this.state.end
+    });
+    
+  }
 
+  resetBroad =() => {
+    const history = [{
+      squares: Array(225).fill(null),
+      coordinate: [],
+      color: Array(225).fill('green'),
+    }];
+    this.setState({
+      history: history,
+      stepNumber: 0,
+      xIsNext: true,
+      end: false
+    });
+    reset()
+  }
 
+  render() {
+    const { history, stepNumber } = this.state;
+    const current = history[stepNumber];
+    // console.log(current)
 
+    return (
+      <div className="game">
+        <div className="game-board">
+          <GobangBoard
+            squares={current.squares}
+            color={current.color}
+            onClick={(i) => this.handleClick(i)}
+          />
+        </div>
+        <div>
+          <div>
+            <button onClick={() => this.undoPiece()}>Undo</button>
+          </div>
+          <div>
+            <button onClick={() => getAllSteps()}>get history</button>
+          </div>
+          <div>
+            <button onClick={() => this.resetBroad()}>Reset</button>
+          </div>
+          <div>
+            <button onClick={() => this.findFour()}>findAliveFour</button>
+          </div>
+          <div>
+          <button onClick={() => this.findBlockedThree()}>findBlockedThree</button>
+          </div>
+        </div>
+        
+      </div>
+    );
+  }
+}
 
-
-// // /**
-// //    * @function 根据棋子索引分配坐标
-// //    * @returns {array} 
-// //    * */
-// //  produceCoordinate = () => {
-// //   const size = 15; // board size
-// //   const arrayLength = size * size;
-// //   let coordinateArray = []; 
-// //   let yInit = size; 
-// //   for (let i = 0; i < arrayLength; i++) {
-// //     let indexNumber = i + 1;
-// //     if (indexNumber % size > 0) {
-// //       coordinateArray.push({ x: indexNumber % size, y: yInit })
-// //     } else {
-// //       coordinateArray.push({ x: size, y: yInit })
-// //       yInit = yInit - 1;
-// //     }
-// //   }
-// //   return coordinateArray;
-// // }
+export default Gomoku;

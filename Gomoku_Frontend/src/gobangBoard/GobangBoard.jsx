@@ -5,6 +5,7 @@ import GobangPiece from '../gobangPiece/GobangPiece';
 class GobangBoard extends Component {
   renderSquare(i) {
     let className = 'square'
+    // console.log(this.props.squares)
     return (
       <GobangPiece
         key={i}

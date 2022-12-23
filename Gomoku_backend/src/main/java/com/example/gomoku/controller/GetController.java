@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.gomoku.game.GomokuRule;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
@@ -19,13 +20,13 @@ public class GetController {
     }
     @GetMapping(value = "/set/{id}")
     @ResponseBody
-    public HashSet<GomokuRule.Cell> get(@PathVariable Integer id) {
+    public HashSet<GomokuRule.Coordinate> get(@PathVariable Integer id) {
         return Gomoku.setCoordinate(id);
     }
 
     @RequestMapping(value = "/undo", method = RequestMethod.GET)
     @ResponseBody
-    public String undo() {
+    public HashSet<GomokuRule.Cell> undo() {
         return Gomoku.undo();
     }
 
@@ -37,7 +38,7 @@ public class GetController {
 
     @RequestMapping(value = "/getAllStep", method = RequestMethod.GET)
     @ResponseBody
-    public ArrayList<GomokuRule.Cell> getAllStep() {
+    public HashSet<GomokuRule.Cell> getAllStep() {
         return Gomoku.getAllStep();
     }
 
@@ -47,11 +48,10 @@ public class GetController {
         Gomoku.reset();
     }
 
-    @RequestMapping(value = "/GomokuAliveFour", method = RequestMethod.GET)
+    @GetMapping(value = "/getInstance/{instance}")
     @ResponseBody
-    public HashSet< HashSet<GomokuRule.Cell> > GomokuEstimate() {
-        return Gomoku.getAliveFour();
+    public HashSet< HashSet<GomokuRule.Coordinate> > getInstance(@PathVariable String instance) {
+        System.out.println(instance);
+        return Gomoku.getArrayByInstance(instance);
     }
-
-
 }

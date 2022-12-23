@@ -12,5 +12,6 @@ export const getType = (i) => ajax('/type/', i)
 export const getAllSteps = () => ajax('/getAllStep')
 // reset
 export const reset = () => ajax('/reset')
-// find alive four
-export const findAliveFour = () => ajax('/GomokuAliveFour')
+
+// get instance array
+export const findInstance = (instance) => ajax('/getInstance/', instance)
