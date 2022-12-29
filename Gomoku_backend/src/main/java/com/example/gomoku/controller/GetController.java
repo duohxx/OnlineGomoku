@@ -2,6 +2,7 @@ package com.example.gomoku.controller;
 
 import com.example.gomoku.game.GomokuAI;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Indexed;
 import org.springframework.web.bind.annotation.*;
 import com.example.gomoku.game.GomokuRule;
 
@@ -53,5 +54,21 @@ public class GetController {
     public HashSet< HashSet<GomokuRule.Coordinate> > getInstance(@PathVariable String instance) {
         System.out.println(instance);
         return Gomoku.getArrayByInstance(instance);
+    }
+
+    @GetMapping(value = "/getScore")
+    @ResponseBody
+    public Integer getScore( ) {
+        Integer score = Gomoku.gerScore();
+        System.out.println(score);
+        return score;
+    }
+
+    @GetMapping(value = "/AIplay")
+    @ResponseBody
+    public GomokuRule.Coordinate AIplay( ) {
+        GomokuRule.Coordinate coordinate = Gomoku.ALPlay();
+        System.out.println("AI think the best move is: " + coordinate);
+        return coordinate;
     }
 }

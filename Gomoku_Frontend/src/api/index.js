@@ -12,6 +12,9 @@ export const getType = (i) => ajax('/type/', i)
 export const getAllSteps = () => ajax('/getAllStep')
 // reset
 export const reset = () => ajax('/reset')
-
 // get instance array
 export const findInstance = (instance) => ajax('/getInstance/', instance)
+// get current score
+export const getScore = () => ajax('/getScore')
+// AI play
+export const AIplay = () => ajax('/AIplay')

@@ -6,7 +6,9 @@ import{
   setCoordinate,
   getAllSteps,
   reset,
-  findInstance
+  findInstance,
+  getScore,
+  AIplay
 } from '../api/index'
 class Gomoku extends Component {
 
@@ -81,6 +83,22 @@ class Gomoku extends Component {
     return step % 2 === 1 ? 'O' : 'X'
   }
 
+  async AIplay(){
+    var color = Array(225).fill('green')
+    const response = await AIplay();
+    if ( response.status === 200 ){
+      console.log("AI think the next best coordinate is: ( " + response.data.x +", " + response.data.y + " )")
+      const coordinate = response.data
+      color[coordinate.x - 1 + 15 * (coordinate.y - 1)] = "White"
+    } else {
+      console( response.err )
+    }
+    this.setState({
+      color: color,
+    });
+    
+  }
+
   async getAllPieces() {
     let coordinate = Array(225).fill(null)
     const response = await getAllSteps();
@@ -116,6 +134,15 @@ class Gomoku extends Component {
       xIsNext: true,  
       end: false   // indicate the game state
     }) 
+  }
+
+  async getScore () {
+    const response = await getScore()
+    if( response.status === 200 ){
+      console.log(response.data)
+    } else {
+      console.log(response.err)
+    }
   }
 
   async findInstance() {
@@ -163,6 +190,7 @@ class Gomoku extends Component {
             <button onClick={() => this.findInstance()}>Find Instance</button>
             <select id="InstanceType">
               <option value="Four">Four</option>
+              <option value="GapFour">GapFour</option>
               <option value="BlockedFour">BlockedFour</option>
               <option value="Three">Three</option>
               <option value="BlockedThree">BlockedThree</option>
@@ -170,8 +198,13 @@ class Gomoku extends Component {
               <option value="BlockedTwo">BlockedTwo</option>
             </select>
           </div>
+          <div>
+            <button onClick={() => this.getScore()}>getScore</button>
+          </div>
+          <div>
+            <button onClick={() => this.AIplay()}>AIplay</button>
+          </div>
         </div>
-        
       </div>
     );
   }

@@ -8,28 +8,37 @@ public class GomokuRule {
     private int size = 15;   // the size of broad
     // private int arrayLength = size * size;
     public record Coordinate(int x, int y){ }
-
-    public record Cell(Coordinate coordinate, int steps) { } ;
-
-//    private HashMap<Coordinate, Integer> grid = new HashMap<>();
+    public record Cell(Coordinate coordinate, int steps) {
+        public int x(){ return coordinate.x(); }
+        public int y(){ return coordinate.y(); }
+    } ;
     private HashSet<Cell> broad = new HashSet<>();
-
     private Cell curCell;
     public GomokuRule(){
 
     }
-
+    public Coordinate ALPlay() {
+        GomokuAI g = new GomokuAI( this.broad );
+        Object[] res = g.minimaxAlphaBeta(3, true, -1, 1000000);
+//        g.getLastSteps();
+        System.out.println("The best score for next step is: " + (Integer) res[0]);
+        return (Coordinate)res[1];
+    }
     public HashSet< HashSet<Coordinate>> getArrayByInstance(String s){
         GomokuAI g = new GomokuAI( this.broad );
         return g.getArrayByInstance(s);
     }
 
+    public Integer gerScore() {
+        GomokuAI g = new GomokuAI( this.broad );
+        return g.getScore();
+    }
     public HashSet<Cell> getAllStep(){
 //        ArrayList<Cell> allStep = new ArrayList<>();
 //        this.grid.forEach((coordinate, step) -> {
 //            allStep.add(coordinate);
 //        });
-        System.out.println(this.broad);
+//        System.out.println(this.broad);
         return this.broad;
     }
     public HashSet<Coordinate> setCoordinate(int n){
@@ -45,7 +54,7 @@ public class GomokuRule {
         if(n==0)
             return ' ';
         else
-            return n % 2 == 0 ? 'O' : 'X';
+            return n % 2 == 0 ? 'X' : 'O';
     }
 
     public char getCurType(){
